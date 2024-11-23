@@ -6,12 +6,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.haikal.noteapp.adapter.NoteAdapter
 import com.haikal.noteapp.databinding.ActivityMainBinding
+import com.haikal.noteapp.helper.NoteDatabaseHelper
 import com.haikal.noteapp.screen.AddNoteActivity
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var noteAdapter: NoteAdapter
+    private lateinit var db: NoteDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +28,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        db = NoteDatabaseHelper(this)
+        noteAdapter = NoteAdapter(db.getAllNotes(), this)
+
+        binding.notesRecycleview.layoutManager = LinearLayoutManager(this)
+        binding.notesRecycleview.adapter = noteAdapter
+
 //        enableEdgeToEdge()
 //        setContentView(R.layout.activity_main)
 //        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -31,4 +42,13 @@ class MainActivity : AppCompatActivity() {
 //            insets
 //        }
     }
+
+    override fun onResume() {
+        super.onResume()
+        val notes = db.getAllNotes()
+        noteAdapter.refreshData(notes)
+    }
+
+    // TASK
+    // ketika item list note di klik, akan pindah ke page detail sesuai dengan item dan content
 }
